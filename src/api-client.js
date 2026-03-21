@@ -1,12 +1,9 @@
-import fs from 'fs/promises';
-import path from 'path';
-
 export async function fetchAllMatches() {
-    const worldcupData = await fs.readFile(path.join(process.cwd(), 'worldcup.json'), 'utf8');
-    const worldcupFinalsData = await fs.readFile(path.join(process.cwd(), 'worldcup_finals.json'), 'utf8');
+    const response = await fetch('https://raw.githubusercontent.com/openfootball/worldcup.json/refs/heads/master/2026/worldcup.json');
+    if (!response.ok) {
+        throw new Error(`Failed to fetch matches: ${response.statusText}`);
+    }
+    const worldcup = await response.json();
 
-    const worldcup = JSON.parse(worldcupData);
-    const worldcupFinals = JSON.parse(worldcupFinalsData);
-
-    return [...(worldcup.matches || []), ...(worldcupFinals.matches || [])];
+    return worldcup.matches || [];
 }
