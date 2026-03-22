@@ -1,6 +1,27 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const teams = JSON.parse(fs.readFileSync(path.join(__dirname, '../teams.json'), 'utf8'));
+
+function getTeamDetails(teamName) {
+    if (!teamName) return { title: 'TBD', name: 'TBD' };
+    // preference to use name_normalised if available
+    const team = teams.find(t => t.name_normalised === teamName || t.name === teamName);
+    if (team && team.flag_icon && team.fifa_code) {
+        return { title: `${team.flag_icon} ${team.fifa_code}`, name: team.name };
+    }
+    return { title: teamName, name: teamName };
+}
+
 export function transformMatches(matches) {
     return matches.map((match, index) => {
-        const title = `${match.team1 || 'TBD'} vs ${match.team2 || 'TBD'}`;
+        const team1Details = getTeamDetails(match.team1);
+        const team2Details = getTeamDetails(match.team2);
+
+        const title = `${team1Details.title} vs ${team2Details.title}`;
 
         // Parse time and timezone, e.g., "13:00 UTC-6"
         let timeString = '18:00:00Z';
@@ -27,7 +48,9 @@ export function transformMatches(matches) {
         const location = typeof match.ground === 'string'
             ? match.ground
             : (match.ground?.name?.[0] || 'TBD');
-        const description = [match.round, match.group].filter(Boolean).join(' ');
+
+        const originalDescription = [match.round, match.group].filter(Boolean).join(' ');
+        const description = `${team1Details.name} vs ${team2Details.name}\n${originalDescription}`.trim();
 
         return {
             id: index + 1,
