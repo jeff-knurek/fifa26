@@ -21,7 +21,17 @@ export function transformMatches(matches) {
         const team1Details = getTeamDetails(match.team1);
         const team2Details = getTeamDetails(match.team2);
 
-        const title = `${team1Details.title} vs ${team2Details.title}`;
+        // check for score data in json, and add to title, then later the description
+        // if match day is less than 3 days ago, do not show the score in the title or description
+        let score = '';
+        const today = new Date();
+        const matchDate = new Date(match.date);
+        const diffInDays = Math.floor((today - matchDate) / (1000 * 60 * 60 * 24));
+        if (diffInDays >= 3 && match.score && match.score.ft) {
+            score = ` ${match.score.ft[0]}-${match.score.ft[1]}`;
+        }
+
+        const title = `${team1Details.title} vs ${team2Details.title}${score}`;
 
         // Parse time and timezone, e.g., "13:00 UTC-6"
         let timeString = '18:00:00Z';
@@ -49,8 +59,33 @@ export function transformMatches(matches) {
             ? match.ground
             : (match.ground?.name?.[0] || 'TBD');
 
-        const originalDescription = [match.round, match.group].filter(Boolean).join(' ');
-        const description = `${team1Details.name} vs ${team2Details.name}\n${originalDescription}`.trim();
+        const descriptionLines = match.group
+            ? [match.group, `${team1Details.name} vs ${team2Details.name}`, match.round]
+            : [match.round, `${team1Details.name} vs ${team2Details.name}`];
+
+        const validLines = descriptionLines.filter(Boolean);
+
+        if (diffInDays >= 3 && match.score && match.score.ft) {
+            validLines.push(`Score: ${match.score.ft[0]}-${match.score.ft[1]}`);
+
+            const formatGoal = (goal) => {
+                const offset = goal.offset ? `+${goal.offset}` : '';
+                const penalty = goal.penalty ? ' (P)' : '';
+                return `${goal.name} (${goal.minute}${offset}min)${penalty}`;
+            };
+
+            // add goals to description for each team
+            if (match.goals1 && match.goals1.length > 0) {
+                validLines.push(...match.goals1.map(formatGoal));
+            }
+            if (match.goals2 && match.goals2.length > 0) {
+                validLines.push(...match.goals2.map(formatGoal));
+            }
+        } else if (diffInDays >= 0) {
+            validLines.push(`Score: PENDING`);
+        }
+
+        const description = validLines.join('\n');
 
         return {
             id: index + 1,
