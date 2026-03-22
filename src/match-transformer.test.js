@@ -33,18 +33,18 @@ test('transformMatches converts raw matches to simplified events', () => {
     // Test first match (with group and ground)
     assert.strictEqual(events[0].id, 1);
     assert.strictEqual(events[0].uid, 'match-1@fifa26.calendar');
-    assert.strictEqual(events[0].title, 'Mexico vs South Africa');
+    assert.strictEqual(events[0].title, '🇲🇽 MEX vs 🇿🇦 RSA');
     assert.strictEqual(events[0].start, '2026-06-11T18:00:00.000Z');
     assert.strictEqual(events[0].end, '2026-06-11T19:30:00.000Z');
     assert.strictEqual(events[0].location, 'Mexico City');
-    assert.strictEqual(events[0].description, 'Matchday 1 Group A');
+    assert.strictEqual(events[0].description, 'Mexico vs South Africa\nMatchday 1 Group A');
 
     // Test second match (finals, no group)
     assert.strictEqual(events[1].title, '2A vs 2B');
-    assert.strictEqual(events[1].description, 'Round of 32');
+    assert.strictEqual(events[1].description, '2A vs 2B\nRound of 32');
 
     // Test third match (missing some fields)
     assert.strictEqual(events[2].title, 'TBD vs TBD');
     assert.strictEqual(events[2].location, 'TBD');
-    assert.strictEqual(events[2].description, 'Quarter-final');
+    assert.strictEqual(events[2].description, 'TBD vs TBD\nQuarter-final');
 });

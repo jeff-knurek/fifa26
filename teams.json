@@ -1,0 +1,343 @@
+[
+    {
+        "name": "Mexico",
+        "flag_icon": "🇲🇽",
+        "flag_unicode": "\\u{1F1F2}\\u{1F1FD}",
+        "fifa_code": "MEX",
+        "group": "A"
+    },
+    {
+        "name": "South Africa",
+        "flag_icon": "🇿🇦",
+        "flag_unicode": "\\u{1F1FF}\\u{1F1E6}",
+        "fifa_code": "RSA",
+        "group": "A"
+    },
+    {
+        "name": "South Korea",
+        "name_normalised": "Korea Republic",
+        "flag_icon": "🇰🇷",
+        "flag_unicode": "\\u{1F1F0}\\u{1F1F7}",
+        "fifa_code": "KOR",
+        "group": "A"
+    },
+    {
+        "name": "UEFA Path D winner",
+        "flag_icon": null,
+        "flag_unicode": null,
+        "fifa_code": null,
+        "group": "A"
+    },
+    {
+        "name": "Canada",
+        "flag_icon": "🇨🇦",
+        "flag_unicode": "\\u{1F1E8}\\u{1F1E6}",
+        "fifa_code": "CAN",
+        "group": "B"
+    },
+    {
+        "name": "UEFA Path A winner",
+        "flag_icon": null,
+        "flag_unicode": null,
+        "fifa_code": null,
+        "group": "B"
+    },
+    {
+        "name": "Qatar",
+        "flag_icon": "🇶🇦",
+        "flag_unicode": "\\u{1F1F6}\\u{1F1E6}",
+        "fifa_code": "QAT",
+        "group": "B"
+    },
+    {
+        "name": "Switzerland",
+        "flag_icon": "🇨🇭",
+        "flag_unicode": "\\u{1F1E8}\\u{1F1ED}",
+        "fifa_code": "SUI",
+        "group": "B"
+    },
+    {
+        "name": "Brazil",
+        "flag_icon": "🇧🇷",
+        "flag_unicode": "\\u{1F1E7}\\u{1F1F7}",
+        "fifa_code": "BRA",
+        "group": "C"
+    },
+    {
+        "name": "Morocco",
+        "flag_icon": "🇲🇦",
+        "flag_unicode": "\\u{1F1F2}\\u{1F1E6}",
+        "fifa_code": "MAR",
+        "group": "C"
+    },
+    {
+        "name": "Haiti",
+        "flag_icon": "🇭🇹",
+        "flag_unicode": "\\u{1F1ED}\\u{1F1F9}",
+        "fifa_code": "HAI",
+        "group": "C"
+    },
+    {
+        "name": "Scotland",
+        "flag_icon": "🏴",
+        "flag_unicode": null,
+        "fifa_code": "SCO",
+        "group": "C"
+    },
+    {
+        "name": "USA",
+        "name_normalised": "United States",
+        "flag_icon": "🇺🇸",
+        "flag_unicode": "\\u{1F1FA}\\u{1F1F8}",
+        "fifa_code": "USA",
+        "group": "D"
+    },
+    {
+        "name": "Paraguay",
+        "flag_icon": "🇵🇾",
+        "flag_unicode": "\\u{1F1F5}\\u{1F1FE}",
+        "fifa_code": "PAR",
+        "group": "D"
+    },
+    {
+        "name": "Australia",
+        "flag_icon": "🇦🇺",
+        "flag_unicode": "\\u{1F1E6}\\u{1F1FA}",
+        "fifa_code": "AUS",
+        "group": "D"
+    },
+    {
+        "name": "UEFA Path C winner",
+        "flag_icon": null,
+        "flag_unicode": null,
+        "fifa_code": null,
+        "group": "D"
+    },
+    {
+        "name": "Germany",
+        "flag_icon": "🇩🇪",
+        "flag_unicode": "\\u{1F1E9}\\u{1F1EA}",
+        "fifa_code": "GER",
+        "group": "E"
+    },
+    {
+        "name": "Curaçao",
+        "flag_icon": "🇨🇼",
+        "flag_unicode": "\\u{1F1E8}\\u{1F1FC}",
+        "fifa_code": "CUW",
+        "group": "E"
+    },
+    {
+        "name": "Ivory Coast",
+        "name_normalised": "Cote d'Ivoire",
+        "flag_icon": "🇨🇮",
+        "flag_unicode": "\\u{1F1E8}\\u{1F1EE}",
+        "fifa_code": "CIV",
+        "group": "E"
+    },
+    {
+        "name": "Ecuador",
+        "flag_icon": "🇪🇨",
+        "flag_unicode": "\\u{1F1EA}\\u{1F1E8}",
+        "fifa_code": "ECU",
+        "group": "E"
+    },
+    {
+        "name": "Netherlands",
+        "flag_icon": "🇳🇱",
+        "flag_unicode": "\\u{1F1F3}\\u{1F1F1}",
+        "fifa_code": "NED",
+        "group": "F"
+    },
+    {
+        "name": "Japan",
+        "flag_icon": "🇯🇵",
+        "flag_unicode": "\\u{1F1EF}\\u{1F1F5}",
+        "fifa_code": "JPN",
+        "group": "F"
+    },
+    {
+        "name": "UEFA Path B winner",
+        "flag_icon": null,
+        "flag_unicode": null,
+        "fifa_code": null,
+        "group": "F"
+    },
+    {
+        "name": "Tunisia",
+        "flag_icon": "🇹🇳",
+        "flag_unicode": "\\u{1F1F9}\\u{1F1F3}",
+        "fifa_code": "TUN",
+        "group": "F"
+    },
+    {
+        "name": "Belgium",
+        "flag_icon": "🇧🇪",
+        "flag_unicode": "\\u{1F1E7}\\u{1F1EA}",
+        "fifa_code": "BEL",
+        "group": "G"
+    },
+    {
+        "name": "Egypt",
+        "flag_icon": "🇪🇬",
+        "flag_unicode": "\\u{1F1EA}\\u{1F1EC}",
+        "fifa_code": "EGY",
+        "group": "G"
+    },
+    {
+        "name": "Iran",
+        "name_normalised": "IR Iran",
+        "flag_icon": "🇮🇷",
+        "flag_unicode": "\\u{1F1EE}\\u{1F1F7}",
+        "fifa_code": "IRN",
+        "group": "G"
+    },
+    {
+        "name": "New Zealand",
+        "flag_icon": "🇳🇿",
+        "flag_unicode": "\\u{1F1F3}\\u{1F1FF}",
+        "fifa_code": "NZL",
+        "group": "G"
+    },
+    {
+        "name": "Spain",
+        "flag_icon": "🇪🇸",
+        "flag_unicode": "\\u{1F1EA}\\u{1F1F8}",
+        "fifa_code": "ESP",
+        "group": "H"
+    },
+    {
+        "name": "Cape Verde",
+        "name_normalised": "Cabo Verde",
+        "flag_icon": "🇨🇻",
+        "flag_unicode": "\\u{1F1E8}\\u{1F1FB}",
+        "fifa_code": "CPV",
+        "group": "H"
+    },
+    {
+        "name": "Saudi Arabia",
+        "flag_icon": "🇸🇦",
+        "flag_unicode": "\\u{1F1F8}\\u{1F1E6}",
+        "fifa_code": "KSA",
+        "group": "H"
+    },
+    {
+        "name": "Uruguay",
+        "flag_icon": "🇺🇾",
+        "flag_unicode": "\\u{1F1FA}\\u{1F1FE}",
+        "fifa_code": "URU",
+        "group": "H"
+    },
+    {
+        "name": "France",
+        "flag_icon": "🇫🇷",
+        "flag_unicode": "\\u{1F1EB}\\u{1F1F7}",
+        "fifa_code": "FRA",
+        "group": "I"
+    },
+    {
+        "name": "Senegal",
+        "flag_icon": "🇸🇳",
+        "flag_unicode": "\\u{1F1F8}\\u{1F1F3}",
+        "fifa_code": "SEN",
+        "group": "I"
+    },
+    {
+        "name": "IC Path 2 winner",
+        "flag_icon": null,
+        "flag_unicode": null,
+        "fifa_code": null,
+        "group": "I"
+    },
+    {
+        "name": "Norway",
+        "flag_icon": "🇳🇴",
+        "flag_unicode": "\\u{1F1F3}\\u{1F1F4}",
+        "fifa_code": "NOR",
+        "group": "I"
+    },
+    {
+        "name": "Argentina",
+        "flag_icon": "🇦🇷",
+        "flag_unicode": "\\u{1F1E6}\\u{1F1F7}",
+        "fifa_code": "ARG",
+        "group": "J"
+    },
+    {
+        "name": "Algeria",
+        "flag_icon": "🇩🇿",
+        "flag_unicode": "\\u{1F1E9}\\u{1F1FF}",
+        "fifa_code": "ALG",
+        "group": "J"
+    },
+    {
+        "name": "Austria",
+        "flag_icon": "🇦🇹",
+        "flag_unicode": "\\u{1F1E6}\\u{1F1F9}",
+        "fifa_code": "AUT",
+        "group": "J"
+    },
+    {
+        "name": "Jordan",
+        "flag_icon": "🇯🇴",
+        "flag_unicode": "\\u{1F1EF}\\u{1F1F4}",
+        "fifa_code": "JOR",
+        "group": "J"
+    },
+    {
+        "name": "Portugal",
+        "flag_icon": "🇵🇹",
+        "flag_unicode": "\\u{1F1F5}\\u{1F1F9}",
+        "fifa_code": "POR",
+        "group": "K"
+    },
+    {
+        "name": "IC Path 1 winner",
+        "flag_icon": null,
+        "flag_unicode": null,
+        "fifa_code": null,
+        "group": "K"
+    },
+    {
+        "name": "Uzbekistan",
+        "flag_icon": "🇺🇿",
+        "flag_unicode": "\\u{1F1FA}\\u{1F1FF}",
+        "fifa_code": "UZB",
+        "group": "K"
+    },
+    {
+        "name": "Colombia",
+        "flag_icon": "🇨🇴",
+        "flag_unicode": "\\u{1F1E8}\\u{1F1F4}",
+        "fifa_code": "COL",
+        "group": "K"
+    },
+    {
+        "name": "England",
+        "flag_icon": "🏴",
+        "flag_unicode": null,
+        "fifa_code": "ENG",
+        "group": "L"
+    },
+    {
+        "name": "Croatia",
+        "flag_icon": "🇭🇷",
+        "flag_unicode": "\\u{1F1ED}\\u{1F1F7}",
+        "fifa_code": "CRO",
+        "group": "L"
+    },
+    {
+        "name": "Ghana",
+        "flag_icon": "🇬🇭",
+        "flag_unicode": "\\u{1F1EC}\\u{1F1ED}",
+        "fifa_code": "GHA",
+        "group": "L"
+    },
+    {
+        "name": "Panama",
+        "flag_icon": "🇵🇦",
+        "flag_unicode": "\\u{1F1F5}\\u{1F1E6}",
+        "fifa_code": "PAN",
+        "group": "L"
+    }
+]
