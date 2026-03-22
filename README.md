@@ -10,6 +10,12 @@ Works with Google Calendar, Apple Calendar, Outlook, and anything that accepts a
 
 **NOTE**: The calendar is only updated once a day. Don't panic if your calendar isn't updated immediately after a match.
 
+### Example
+
+How it looks in Google Calendar. The calnedar will auto-adjust to your timezone:
+
+![Calendar Screenshot](example-screenshot.png)
+
 ---
 
 ## How it works: The nitty gritty details
