@@ -1,4 +1,4 @@
-import { fetchAllMatches } from '../src/api-client.js';
+import { fetchAllMatches, fetchTeams } from '../src/api-client.js';
 import { transformMatches } from '../src/match-transformer.js';
 import { generateIcal } from '../src/ical-generator.js';
 import { uploadCalendar } from '../src/blob-uploader.js';
@@ -10,11 +10,16 @@ export default async function handler(req, res) {
     }
 
     try {
-        // 2. Fetch raw match data
-        const matches = await fetchAllMatches();
+        // 2. Fetch raw match data and teams in parallel
+        console.log('Fetching matches and teams...');
+        const [matches, teams] = await Promise.all([
+            fetchAllMatches(),
+            fetchTeams()
+        ]);
+        console.log(`Fetched ${matches.length} matches and ${teams.length} teams.`);
 
         // 3. Transform data to events
-        const events = transformMatches(matches);
+        const events = transformMatches(matches, teams);
 
         // 4. Safety check point: Abort if fewer than 50 events to prevent overriding a good calendar with empty data accidentally
         if (events.length < 50) {
