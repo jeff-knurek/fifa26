@@ -1,14 +1,17 @@
 import fs from 'fs/promises';
-import { fetchAllMatches } from './api-client.js';
+import { fetchAllMatches, fetchTeams } from './api-client.js';
 import { transformMatches } from './match-transformer.js';
 import { generateIcal } from './ical-generator.js';
 
 async function main() {
-    console.log('⚽ Fetching World Cup matches from local JSON...');
-    const matches = await fetchAllMatches();
+    console.log('⚽ Fetching World Cup matches and teams from remote APIs...');
+    const [matches, teams] = await Promise.all([
+        fetchAllMatches(),
+        fetchTeams()
+    ]);
 
-    console.log(`✅ Found ${matches.length} matches. Transforming to events...`);
-    const events = transformMatches(matches);
+    console.log(`✅ Found ${matches.length} matches and ${teams.length} teams. Transforming...`);
+    const events = transformMatches(matches, teams);
 
     console.log(`✅ Transformed ${events.length} events. Generating iCal string...`);
     const icalString = generateIcal(events);

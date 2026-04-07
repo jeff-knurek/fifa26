@@ -53,6 +53,14 @@ test('transformMatches converts raw matches to simplified events', () => {
             ground: { name: ["Toronto"] }
         }
     ];
+
+    const mockTeams = [
+        { name: "Mexico", flag_icon: "🇲🇽", fifa_code: "MEX" },
+        { name: "South Africa", flag_icon: "🇿🇦", fifa_code: "RSA" },
+        { name: "Canada", flag_icon: "🇨🇦", fifa_code: "CAN" },
+        { name: "USA", name_normalised: "United States", flag_icon: "🇺🇸", fifa_code: "USA" }
+    ];
+
     // Mock today to be 2026-06-19
     const originalDate = Date;
     global.Date = class extends Date {
@@ -65,7 +73,8 @@ test('transformMatches converts raw matches to simplified events', () => {
         }
     };
 
-    const events = transformMatches(rawMatches);
+    const events = transformMatches(rawMatches, mockTeams);
+
 
     assert.strictEqual(events.length, 5);
 
@@ -94,4 +103,23 @@ test('transformMatches converts raw matches to simplified events', () => {
     // Test that since today == 2026-06-19, there are no scores in the title or description of match 4
     assert.strictEqual(events[4].title, '🇨🇦 CAN vs 🇺🇸 USA');
     assert.strictEqual(events[4].description, 'Group C\nCanada vs USA\nMatchday 4\nScore: PENDING');
+});
+
+test('transformMatches throws an error if teams data is missing or invalid', () => {
+    const rawMatches = [{ team1: "Mexico", team2: "USA" }];
+
+    assert.throws(
+        () => transformMatches(rawMatches),
+        { name: 'TypeError', message: 'Team data is missing or invalid. Expected an array of teams.' }
+    );
+
+    assert.throws(
+        () => transformMatches(rawMatches, null),
+        { name: 'TypeError', message: 'Team data is missing or invalid. Expected an array of teams.' }
+    );
+
+    assert.throws(
+        () => transformMatches(rawMatches, {}),
+        { name: 'TypeError', message: 'Team data is missing or invalid. Expected an array of teams.' }
+    );
 });

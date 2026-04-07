@@ -1,13 +1,10 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const teams = JSON.parse(fs.readFileSync(path.join(__dirname, '../teams.json'), 'utf8'));
-
-function getTeamDetails(teamName) {
+function getTeamDetails(teamName, teams) {
     if (!teamName) return { title: 'TBD', name: 'TBD' };
+
+    if (!Array.isArray(teams)) {
+        throw new TypeError("Team data is missing or invalid. Expected an array of teams.");
+    }
+
     // preference to use name_normalised if available
     const team = teams.find(t => t.name_normalised === teamName || t.name === teamName);
     if (team && team.flag_icon && team.fifa_code) {
@@ -16,10 +13,10 @@ function getTeamDetails(teamName) {
     return { title: teamName, name: teamName };
 }
 
-export function transformMatches(matches) {
+export function transformMatches(matches, teams) {
     return matches.map((match, index) => {
-        const team1Details = getTeamDetails(match.team1);
-        const team2Details = getTeamDetails(match.team2);
+        const team1Details = getTeamDetails(match.team1, teams);
+        const team2Details = getTeamDetails(match.team2, teams);
 
         // check for score data in json, and add to title, then later the description
         // if match day is less than 3 days ago, do not show the score in the title or description
