@@ -4,7 +4,7 @@
   /** @type {import('./$types').PageData} */
   let { data } = $props();
 
-  const { groups } = data;
+  const groups = $derived(data.groups);
 
   // Track which groups are expanded (all collapsed by default)
   let expandedGroups = $state(new Set());
@@ -42,10 +42,9 @@
     }
   }
 
-  const totalTeams = groups.reduce((s, g) => s + g.teams.length, 0);
-  const totalPlayers = groups.reduce(
-    (s, g) => s + g.teams.reduce((ts, t) => ts + t.players.length, 0),
-    0,
+  const totalTeams = $derived(groups.reduce((s, g) => s + g.teams.length, 0));
+  const totalPlayers = $derived(
+    groups.reduce((s, g) => s + g.teams.reduce((ts, t) => ts + t.players.length, 0), 0),
   );
 
   function gdClass(gd) {
