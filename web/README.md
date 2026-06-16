@@ -1,42 +1,30 @@
-# sv
+# FIFA World Cup 2026 — Web App
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+SvelteKit app that displays squads, groups, standings, and player rosters for the 2026 World Cup. Deployed on Vercel.
 
-## Creating a project
+## Data
 
-If you're seeing this, you've probably already done this step. Congrats!
+Static JSON files live in `src/data/` and are processed at request time in `+page.server.js`:
 
-```sh
-# create a new project
-npx sv create my-app
-```
+- `worldcup.json` — match results
+- `worldcup.teams.json` — team metadata (flags, FIFA codes)
+- `worldcup.groups.json` — group assignments
+- `worldcup.squads.json` — player rosters with club info
 
-To recreate this project with the same configuration:
+Standings (points, goal difference, goals for) are calculated from match results in the server load function.
 
-```sh
-# recreate this project
-npx sv@0.16.1 create --template minimal --no-types --add sveltekit-adapter="adapter:vercel" --no-install web
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Dev
 
 ```sh
+npm install
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
-
-## Building
-
-To create a production version of your app:
 
 ```sh
-npm run build
+npm run build    # production build
+npm run preview  # preview production build locally
 ```
 
-You can preview the production build with `npm run preview`.
+## Deploy
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+Deployed automatically via Vercel on push to `master`. Uses `@sveltejs/adapter-vercel`.

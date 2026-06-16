@@ -1,14 +1,13 @@
-import groupsJson from '../data/worldcup.groups.json';
-import squadsJson from '../data/worldcup.squads.json';
-import teamsJson from '../data/worldcup.teams.json';
-import matchJson from '../data/worldcup.json';
+const BASE = 'https://raw.githubusercontent.com/openfootball/worldcup.json/refs/heads/master/2026';
 
 /** @type {import('./$types').PageServerLoad} */
-export function load() {
-	const groups = groupsJson;
-	const squads = squadsJson;
-	const teamsInfo = teamsJson;
-	const matchData = matchJson;
+export async function load({ fetch }) {
+	const [matchData, teamsInfo, groups, squads] = await Promise.all([
+		fetch(`${BASE}/worldcup.json`).then((r) => r.json()),
+		fetch(`${BASE}/worldcup.teams.json`).then((r) => r.json()),
+		fetch(`${BASE}/worldcup.groups.json`).then((r) => r.json()),
+		fetch(`${BASE}/worldcup.squads.json`).then((r) => r.json()),
+	]);
 
 	// Build flag map: fifa_code -> flag_icon, team name -> flag_icon
 	/** @type {Record<string, string>} */
