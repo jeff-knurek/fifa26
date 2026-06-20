@@ -19,12 +19,12 @@ export function transformMatches(matches, teams) {
         const team2Details = getTeamDetails(match.team2, teams);
 
         // check for score data in json, and add to title, then later the description
-        // if match day is less than 3 days ago, do not show the score in the title or description
+        // if match day is less than 2 days ago, do not show the score in the title or description
         let score = '';
         const today = new Date();
         const matchDate = new Date(match.date);
         const diffInDays = Math.floor((today - matchDate) / (1000 * 60 * 60 * 24));
-        if (diffInDays >= 3 && match.score && match.score.ft) {
+        if (diffInDays >= 2 && match.score && match.score.ft) {
             score = ` ${match.score.ft[0]}-${match.score.ft[1]}`;
         }
 

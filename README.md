@@ -6,7 +6,7 @@ Use the Subscribe link below to add a live-updating iCal feed of every FIFA Worl
 
 Works with Google Calendar, Apple Calendar, Outlook, and anything that accepts a `.ics` URL.
 
-**NOTE**: Scores are NOT updated live. They are only updated 3 days after the match. This means your calendar won't leak what happened before you get a chance to watch.
+**NOTE**: Scores are NOT updated live. They are only updated 2 days after the match. This means your calendar won't leak what happened before you get a chance to watch.
 
 **NOTE**: The calendar is only updated once a day. Don't panic if your calendar isn't updated immediately after a match.
 
