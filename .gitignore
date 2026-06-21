@@ -4,5 +4,6 @@ node_modules/
 *.log
 .vercel
 .env*.local
+.vscode
 
 worldcup2026.ics
