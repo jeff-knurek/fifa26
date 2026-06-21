@@ -7,7 +7,8 @@
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
-		"prepare": "svelte-kit sync || echo ''"
+		"prepare": "svelte-kit sync || echo ''",
+		"test": "node --test src/**/*.test.js"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-vercel": "^6.3.3",

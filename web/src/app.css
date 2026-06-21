@@ -129,6 +129,47 @@ body {
   margin-top: 4px;
 }
 
+/* ── Tab Navigation ── */
+.tab-nav {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 32px;
+  padding: 6px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+}
+.tab-btn {
+  flex: 1;
+  padding: 11px 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+.tab-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+.tab-btn.active {
+  background: var(--gold);
+  color: #0a0e17;
+  border-color: var(--gold);
+}
+@media (max-width: 500px) {
+  .tab-btn {
+    font-size: 0.75rem;
+    padding: 9px 10px;
+  }
+}
+
 /* ── Group Navigation ── */
 .group-nav {
   display: grid;
@@ -490,6 +531,137 @@ body {
 .pos-DF { background: rgba(59,130,246,0.15); color: var(--blue); }
 .pos-MF { background: rgba(34,197,94,0.15);  color: var(--green); }
 .pos-FW { background: rgba(239,68,68,0.15);  color: var(--red); }
+
+/* ── Top Scorers ── */
+.scorers-wrap {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+.scorers-empty {
+  padding: 60px 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+.scorers-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.scorers-table thead tr {
+  border-bottom: 1px solid var(--border-accent);
+}
+.scorers-th-rank,
+.scorers-th-goals {
+  padding: 12px 16px;
+  text-align: center;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-muted);
+  font-weight: 600;
+  background: rgba(0,0,0,0.15);
+  white-space: nowrap;
+}
+.scorers-th-player,
+.scorers-th-team {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-muted);
+  font-weight: 600;
+  background: rgba(0,0,0,0.15);
+}
+.scorers-row {
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition);
+}
+.scorers-row:last-child {
+  border-bottom: none;
+}
+.scorers-row:hover {
+  background: var(--bg-hover);
+}
+.scorers-td-rank {
+  padding: 13px 16px;
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  width: 48px;
+}
+.scorers-td-rank.rank-top {
+  color: var(--gold);
+  font-weight: 700;
+}
+.scorers-td-player {
+  padding: 13px 16px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+.scorers-td-team {
+  padding: 13px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.scorers-flag {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+.scorers-code {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.scorers-td-goals {
+  padding: 13px 16px;
+  text-align: center;
+  width: 80px;
+}
+.goals-badge {
+  display: inline-block;
+  min-width: 32px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  background: var(--gold-dim);
+  border: 1px solid rgba(245,197,24,0.3);
+  color: var(--gold);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ── Knockout Placeholder ── */
+.knockout-placeholder {
+  padding: 80px 24px;
+  text-align: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+.knockout-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem;
+  color: var(--gold);
+  margin-bottom: 12px;
+  letter-spacing: 0.05em;
+}
+.knockout-sub {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  max-width: 420px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
 
 /* ── Footer ── */
 .site-footer {

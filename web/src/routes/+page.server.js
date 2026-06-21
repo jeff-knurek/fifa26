@@ -1,3 +1,5 @@
+import { computeTopScorers } from '../lib/scorer-utils.js';
+
 const BASE = 'https://raw.githubusercontent.com/openfootball/worldcup.json/refs/heads/master/2026';
 
 /** @type {import('./$types').PageServerLoad} */
@@ -109,5 +111,7 @@ export async function load({ fetch }) {
 		return { name: group.name, teams };
 	});
 
-	return { groups: groupsData };
+	const scorers = computeTopScorers(matchData.matches, teamsInfo);
+
+	return { groups: groupsData, scorers };
 }
