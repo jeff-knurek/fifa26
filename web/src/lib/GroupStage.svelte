@@ -117,6 +117,7 @@
           <table class="standings-table">
             <thead>
               <tr>
+                <th class="standings-th-squad"></th>
                 <th class="standings-th-team" colspan="2">Team</th>
                 <th class="standings-th-num">W</th>
                 <th class="standings-th-num">D</th>
@@ -124,7 +125,6 @@
                 <th class="standings-th-num">GF:GA</th>
                 <th class="standings-th-num">GD</th>
                 <th class="standings-th-num standings-th-pts">Pts</th>
-                <th class="standings-th-squad"></th>
               </tr>
             </thead>
             <tbody>
@@ -133,18 +133,6 @@
                 {@const isTeamOpen = expandedTeams.has(teamKey)}
                 <!-- Team row -->
                 <tr class="standings-row {isTeamOpen ? 'row-open' : ''}">
-                  <td class="standings-td-rank">{tIdx + 1}</td>
-                  <td class="standings-td-team">
-                    <span class="standings-flag">{team.flag}</span>
-                    <span class="standings-name">{team.name}</span>
-                    <span class="standings-code">{team.fifaCode}</span>
-                  </td>
-                  <td class="standings-td-num green">{team.w}</td>
-                  <td class="standings-td-num neutral">{team.d}</td>
-                  <td class="standings-td-num red">{team.l}</td>
-                  <td class="standings-td-num blue">{team.gf}:{team.ga}</td>
-                  <td class="standings-td-num {gdClass(team.gd)}">{gdStr(team.gd)}</td>
-                  <td class="standings-td-pts">{team.points}</td>
                   <td class="standings-td-action">
                     <button
                       class="squad-toggle-btn {isTeamOpen ? 'open' : ''}"
@@ -157,6 +145,18 @@
                       <span class="squad-btn-arrow">▼</span>
                     </button>
                   </td>
+                  <td class="standings-td-rank">{tIdx + 1}</td>
+                  <td class="standings-td-team">
+                    <span class="standings-flag">{team.flag}</span>
+                    <span class="standings-name">{team.name}</span>
+                    <span class="standings-code">{team.fifaCode}</span>
+                  </td>
+                  <td class="standings-td-num green">{team.w}</td>
+                  <td class="standings-td-num neutral">{team.d}</td>
+                  <td class="standings-td-num red">{team.l}</td>
+                  <td class="standings-td-num blue">{team.gf}:{team.ga}</td>
+                  <td class="standings-td-num {gdClass(team.gd)}">{gdStr(team.gd)}</td>
+                  <td class="standings-td-pts">{team.points}</td>
                 </tr>
                 <!-- Squad expansion row -->
                 {#if isTeamOpen}
