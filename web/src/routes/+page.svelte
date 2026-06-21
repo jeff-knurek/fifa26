@@ -8,6 +8,7 @@
 
   const groups = $derived(data.groups);
   const scorers = $derived(data.scorers);
+  const knockoutRounds = $derived(data.knockoutRounds);
 
   let activeTab = $state('group');
 
@@ -67,7 +68,7 @@
   {#if activeTab === 'group'}
     <GroupStage {groups} />
   {:else if activeTab === 'knockout'}
-    <KnockoutStage />
+    <KnockoutStage {knockoutRounds} />
   {:else if activeTab === 'scorers'}
     <TopScorers {scorers} />
   {/if}
