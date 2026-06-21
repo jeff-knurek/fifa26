@@ -537,7 +537,7 @@ body {
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  overflow: hidden;
+  overflow-x: auto;
 }
 .scorers-empty {
   padding: 60px 24px;
