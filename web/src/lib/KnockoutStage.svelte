@@ -24,7 +24,7 @@
   function fmtCode(rawCode) {
     if (rawCode.match(/^W(\d+)$/)) return `Win #${rawCode.slice(1)}`;
     if (rawCode.match(/^L(\d+)$/)) return `Loser #${rawCode.slice(1)}`;
-    if (rawCode.startsWith('3')) return 'Best 3rd';
+    if (rawCode.startsWith('3')) return rawCode;
     return rawCode;
   }
 
@@ -58,7 +58,7 @@
   <div class="bracket">
     {#each mainRounds as round, ri}
       {@const isLast = ri === mainRounds.length - 1}
-      {@const showFull = round.matches.length > 8}
+      {@const showFull = true}
       <div class="round" class:has-connector={!isLast} class:compact={!showFull}>
         <div class="round-label">{ROUND_LABELS[round.name] ?? round.name}</div>
         <ul class="round-matches">
