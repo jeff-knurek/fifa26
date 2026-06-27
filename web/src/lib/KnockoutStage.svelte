@@ -1,7 +1,6 @@
 <script>
   /** @type {{ knockoutRounds: Array<{name:string, matches:any[]}> }} */
   let { knockoutRounds } = $props();
-
   const ROUND_LABELS = {
     'Round of 32': 'R32',
     'Round of 16': 'Round of 16',
@@ -66,6 +65,7 @@
             {@const w = winner(match)}
             <li class="match-slot">
               <div class="match-card" class:played={!!match.score}>
+                <span class="match-num">#{match.num}</span>
 
                 {@render teamRow(match.team1, w === 1, w === 2 && !!match.score, match.score?.[0] ?? null)}
 
@@ -219,6 +219,7 @@
     flex-direction: column;
     gap: 3px;
     min-width: 190px;
+    position: relative;
     transition: border-color var(--transition);
   }
   .match-card:hover {
@@ -232,6 +233,17 @@
   .round.compact .match-card {
     min-width: 150px;
     padding: 8px 10px;
+  }
+
+  .match-num {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    text-transform: uppercase;
   }
 
   /* ── Team row ── */

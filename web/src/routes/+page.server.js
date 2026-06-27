@@ -208,5 +208,43 @@ export async function load({ fetch }) {
 			})
 	}));
 
+	// Reorder each round's matches so adjacent pairs feed the correct next-round slot.
+	// CSS connectors use nth-child(odd/even) pairing, so slot[0]+slot[1] must both
+	// feed the same next-round match, slot[2]+slot[3] the next, etc.
+	// We do a DFS from the Final through W{num} codes to produce correct bracket order.
+	const matchByNum = new Map();
+	for (const round of knockoutRounds) {
+		for (const m of round.matches) matchByNum.set(m.num, m);
+	}
+
+	function srcNums(match) {
+		const s1 = match.team1.code?.match(/^W(\d+)$/);
+		const s2 = match.team2.code?.match(/^W(\d+)$/);
+		return [s1 ? +s1[1] : null, s2 ? +s2[1] : null];
+	}
+
+	function bracketOrder(matchNum, targetDepth, depth = 0) {
+		if (depth === targetDepth) return [matchNum];
+		const match = matchByNum.get(matchNum);
+		if (!match) return [];
+		const [s1, s2] = srcNums(match);
+		return [
+			...(s1 ? bracketOrder(s1, targetDepth, depth + 1) : []),
+			...(s2 ? bracketOrder(s2, targetDepth, depth + 1) : [])
+		];
+	}
+
+	const roundDepths = { 'Final': 0, 'Semi-final': 1, 'Quarter-final': 2, 'Round of 16': 3, 'Round of 32': 4 };
+	const finalMatch = knockoutRounds.find((r) => r.name === 'Final')?.matches[0];
+	if (finalMatch) {
+		for (const round of knockoutRounds) {
+			const depth = roundDepths[round.name];
+			if (depth === undefined) continue;
+			const orderedNums = bracketOrder(finalMatch.num, depth, 0);
+			const matchMap = new Map(round.matches.map((m) => [m.num, m]));
+			round.matches = orderedNums.map((n) => matchMap.get(n)).filter(Boolean);
+		}
+	}
+
 	return { groups: groupsData, scorers, knockoutRounds };
 }
