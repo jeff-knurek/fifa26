@@ -246,5 +246,7 @@ export async function load({ fetch }) {
 		}
 	}
 
-	return { groups: groupsData, scorers, knockoutRounds };
+	const qualifiedThirdNames = qualifiedThirdPlace.map((t) => t.name);
+
+	return { groups: groupsData, scorers, knockoutRounds, qualifiedThirdNames };
 }

@@ -1,8 +1,8 @@
 <script>
   import { fly, slide } from "svelte/transition";
 
-  /** @type {{ groups: any[] }} */
-  let { groups } = $props();
+  /** @type {{ groups: any[], qualifiedThird?: Set<string> }} */
+  let { groups, qualifiedThird = new Set() } = $props();
 
   let expandedGroups = $state(new Set());
   let expandedTeams = $state(new Set());
@@ -131,8 +131,9 @@
               {#each group.teams as team, tIdx}
                 {@const teamKey = `${gIdx}-${tIdx}`}
                 {@const isTeamOpen = expandedTeams.has(teamKey)}
+                {@const rankClass = tIdx <= 1 || (tIdx === 2 && qualifiedThird.has(team.name)) ? 'rank-qualified' : ''}
                 <!-- Team row -->
-                <tr class="standings-row {isTeamOpen ? 'row-open' : ''}">
+                <tr class="standings-row {rankClass} {isTeamOpen ? 'row-open' : ''}">
                   <td class="standings-td-action">
                     <button
                       class="squad-toggle-btn {isTeamOpen ? 'open' : ''}"
