@@ -113,5 +113,138 @@ export async function load({ fetch }) {
 
 	const scorers = computeTopScorers(matchData.matches, teamsInfo);
 
-	return { groups: groupsData, scorers };
+	// ── Knockout bracket resolution ──────────────────────────────────────────
+
+	// group letter -> sorted teams (already sorted: 1st, 2nd, 3rd, 4th)
+	/** @type {Record<string, typeof groupsData[0]['teams']>} */
+	const groupMap = {};
+	for (const g of groupsData) {
+		const letter = g.name.split(' ')[1];
+		groupMap[letter] = g.teams;
+	}
+
+	// Rank all 3rd-place teams, top 8 advance
+	const qualifiedThirdPlace = Object.entries(groupMap)
+		.filter(([, teams]) => teams[2])
+		.map(([letter, teams]) => ({ ...teams[2], groupLetter: letter }))
+		.sort((a, b) => {
+			if (b.points !== a.points) return b.points - a.points;
+			if (b.gd !== a.gd) return b.gd - a.gd;
+			if (b.gf !== a.gf) return b.gf - a.gf;
+			return a.name.localeCompare(b.name);
+		})
+		.slice(0, 8);
+
+	/** @type {Record<number, {name:string,flag:string}>} */
+	const matchWinners = {};
+	/** @type {Record<number, {name:string,flag:string}>} */
+	const matchLosers = {};
+	const usedThirdPlace = new Set();
+
+	function isCode(s) {
+		return /^[12][A-L]$/.test(s) || s.startsWith('3') || /^[WL]\d+$/.test(s);
+	}
+
+	/** @param {string} code @returns {{name:string,flag:string}|null} */
+	function resolveCode(code) {
+		const simple = code.match(/^([12])([A-L])$/);
+		if (simple) {
+			const team = groupMap[simple[2]]?.[parseInt(simple[1]) - 1];
+			return team ? { name: team.name, flag: team.flag } : null;
+		}
+		if (code.startsWith('3')) {
+			const eligible = code.slice(1).split('/');
+			const pick = qualifiedThirdPlace.find(
+				(t) => eligible.includes(t.groupLetter) && !usedThirdPlace.has(t.name)
+			);
+			if (pick) {
+				usedThirdPlace.add(pick.name);
+				return { name: pick.name, flag: pick.flag };
+			}
+			return null;
+		}
+		const w = code.match(/^W(\d+)$/);
+		if (w) return matchWinners[+w[1]] ?? null;
+		const l = code.match(/^L(\d+)$/);
+		if (l) return matchLosers[+l[1]] ?? null;
+		return null;
+	}
+
+	const koRawMatches = matchData.matches.filter((m) => !m.group);
+	const ROUND_ORDER = [
+		'Round of 32',
+		'Round of 16',
+		'Quarter-final',
+		'Semi-final',
+		'Match for third place',
+		'Final'
+	];
+
+	const knockoutRounds = ROUND_ORDER.map((roundName) => ({
+		name: roundName,
+		matches: koRawMatches
+			.filter((m) => m.round === roundName)
+			.map((m) => {
+				const raw1 = m.team1;
+				const raw2 = m.team2;
+				const t1 = isCode(raw1) ? resolveCode(raw1) : { name: raw1, flag: flagByName[raw1] ?? '' };
+				const t2 = isCode(raw2) ? resolveCode(raw2) : { name: raw2, flag: flagByName[raw2] ?? '' };
+				const score = m.score?.ft ?? null;
+
+				if (score && t1 && t2) {
+					const [g1, g2] = score;
+					if (g1 > g2) { matchWinners[m.num] = t1; matchLosers[m.num] = t2; }
+					else if (g2 > g1) { matchWinners[m.num] = t2; matchLosers[m.num] = t1; }
+				}
+
+				return {
+					num: m.num,
+					date: m.date,
+					ground: m.ground,
+					team1: { name: t1?.name ?? raw1, flag: t1?.flag ?? '', resolved: !!t1, confirmed: !isCode(raw1), code: isCode(raw1) ? raw1 : null },
+					team2: { name: t2?.name ?? raw2, flag: t2?.flag ?? '', resolved: !!t2, confirmed: !isCode(raw2), code: isCode(raw2) ? raw2 : null },
+					score
+				};
+			})
+	}));
+
+	// Reorder each round's matches so adjacent pairs feed the correct next-round slot.
+	// CSS connectors use nth-child(odd/even) pairing, so slot[0]+slot[1] must both
+	// feed the same next-round match, slot[2]+slot[3] the next, etc.
+	// We do a DFS from the Final through W{num} codes to produce correct bracket order.
+	const matchByNum = new Map();
+	for (const round of knockoutRounds) {
+		for (const m of round.matches) matchByNum.set(m.num, m);
+	}
+
+	function srcNums(match) {
+		const s1 = match.team1.code?.match(/^W(\d+)$/);
+		const s2 = match.team2.code?.match(/^W(\d+)$/);
+		return [s1 ? +s1[1] : null, s2 ? +s2[1] : null];
+	}
+
+	function bracketOrder(matchNum, targetDepth, depth = 0) {
+		if (depth === targetDepth) return [matchNum];
+		const match = matchByNum.get(matchNum);
+		if (!match) return [];
+		const [s1, s2] = srcNums(match);
+		return [
+			...(s1 ? bracketOrder(s1, targetDepth, depth + 1) : []),
+			...(s2 ? bracketOrder(s2, targetDepth, depth + 1) : [])
+		];
+	}
+
+	const roundDepths = { 'Final': 0, 'Semi-final': 1, 'Quarter-final': 2, 'Round of 16': 3, 'Round of 32': 4 };
+	const finalMatch = knockoutRounds.find((r) => r.name === 'Final')?.matches[0];
+	if (finalMatch) {
+		for (const round of knockoutRounds) {
+			const depth = roundDepths[round.name];
+			if (depth === undefined) continue;
+			const orderedNums = bracketOrder(finalMatch.num, depth, 0);
+			const matchMap = new Map(round.matches.map((m) => [m.num, m]));
+			round.matches = orderedNums.map((n) => matchMap.get(n)).filter(Boolean);
+		}
+	}
+
+	return { groups: groupsData, scorers, knockoutRounds };
 }
