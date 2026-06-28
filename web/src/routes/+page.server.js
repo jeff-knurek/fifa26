@@ -139,30 +139,13 @@ export async function load({ fetch }) {
 	const matchWinners = {};
 	/** @type {Record<number, {name:string,flag:string}>} */
 	const matchLosers = {};
-	const usedThirdPlace = new Set();
 
 	function isCode(s) {
-		return /^[12][A-L]$/.test(s) || s.startsWith('3') || /^[WL]\d+$/.test(s);
+		return /^[WL]\d+$/.test(s);
 	}
 
 	/** @param {string} code @returns {{name:string,flag:string}|null} */
 	function resolveCode(code) {
-		const simple = code.match(/^([12])([A-L])$/);
-		if (simple) {
-			const team = groupMap[simple[2]]?.[parseInt(simple[1]) - 1];
-			return team ? { name: team.name, flag: team.flag } : null;
-		}
-		if (code.startsWith('3')) {
-			const eligible = code.slice(1).split('/');
-			const pick = qualifiedThirdPlace.find(
-				(t) => eligible.includes(t.groupLetter) && !usedThirdPlace.has(t.name)
-			);
-			if (pick) {
-				usedThirdPlace.add(pick.name);
-				return { name: pick.name, flag: pick.flag };
-			}
-			return null;
-		}
 		const w = code.match(/^W(\d+)$/);
 		if (w) return matchWinners[+w[1]] ?? null;
 		const l = code.match(/^L(\d+)$/);
@@ -246,5 +229,7 @@ export async function load({ fetch }) {
 		}
 	}
 
-	return { groups: groupsData, scorers, knockoutRounds };
+	const qualifiedThirdNames = qualifiedThirdPlace.map((t) => t.name);
+
+	return { groups: groupsData, scorers, knockoutRounds, qualifiedThirdNames };
 }

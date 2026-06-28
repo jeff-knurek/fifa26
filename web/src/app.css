@@ -331,6 +331,9 @@ body {
   background: rgba(245,197,24,0.04);
   border-bottom-color: transparent;
 }
+/* Qualification row highlight */
+.standings-row.rank-qualified { background: rgba(34, 197, 94, 0.11); }
+.standings-row.rank-qualified:hover { background: rgba(34, 197, 94, 0.19); }
 /* Highlight top 2 qualifying positions */
 .standings-row:nth-child(1) .standings-td-rank,
 .standings-row:nth-child(2) .standings-td-rank {
