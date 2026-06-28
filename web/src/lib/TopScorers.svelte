@@ -1,6 +1,18 @@
 <script>
   /** @type {{ scorers: { name: string, team: string, teamFlag: string, teamCode: string, goals: number }[] }} */
   let { scorers } = $props();
+
+  const totalGroups = $derived(scorers.length > 0 ? scorers[scorers.length - 1].goalGroup + 1 : 1);
+
+  /** Returns an inline style string for the goals badge based on the scorer's goal-group. */
+  function badgeStyle(goalGroup) {
+    const t = goalGroup / Math.max(totalGroups - 1, 1);
+    // Spread across up to 12 perceptually distinct hues: gold (45°) → violet (285°)
+    const hue = Math.round(45 + t * 240);
+    const sat = Math.round(85 - t * 20);
+    const lit = Math.round(48 + t * 12);
+    return `color: hsl(${hue}, ${sat}%, ${lit}%);`;
+  }
 </script>
 
 <div class="scorers-wrap">
@@ -30,7 +42,7 @@
               <span class="scorers-code">{scorer.teamCode || scorer.team}</span>
             </td>
             <td class="scorers-td-goals">
-              <span class="goals-badge">{scorer.goals}</span>
+              <span class="goals-badge" style={badgeStyle(scorer.goalGroup)}>{scorer.goals}</span>
             </td>
           </tr>
         {/each}
