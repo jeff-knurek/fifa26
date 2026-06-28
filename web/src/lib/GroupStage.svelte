@@ -4,17 +4,17 @@
   /** @type {{ groups: any[], qualifiedThird?: Set<string> }} */
   let { groups, qualifiedThird = new Set() } = $props();
 
-  let expandedGroups = $state(new Set());
+  let collapsedGroups = $state(new Set());
   let expandedTeams = $state(new Set());
   let activeGroupIdx = $state(null);
 
   function toggleGroup(idx) {
-    if (expandedGroups.has(idx)) {
-      expandedGroups.delete(idx);
+    if (collapsedGroups.has(idx)) {
+      collapsedGroups.delete(idx);
     } else {
-      expandedGroups.add(idx);
+      collapsedGroups.add(idx);
     }
-    expandedGroups = new Set(expandedGroups);
+    collapsedGroups = new Set(collapsedGroups);
   }
 
   function toggleTeam(key) {
@@ -82,7 +82,7 @@
 <div class="groups-list">
   {#each visibleGroups as group (group._idx)}
     {@const gIdx = group._idx}
-    {@const isGroupOpen = expandedGroups.has(gIdx)}
+    {@const isGroupOpen = !collapsedGroups.has(gIdx)}
     <section
       class="group-block"
       id="group-{gIdx}"
