@@ -14,6 +14,16 @@
     knockoutRounds.filter(r => r.name !== 'Match for third place' && r.matches.length > 0)
   );
 
+  /** @type {Set<number>} */
+  let expandedMatches = $state(new Set());
+
+  function toggleExpanded(matchNum) {
+    const next = new Set(expandedMatches);
+    if (next.has(matchNum)) next.delete(matchNum);
+    else next.add(matchNum);
+    expandedMatches = next;
+  }
+
   function fmtDate(s) {
     return new Date(s + 'T12:00:00Z').toLocaleDateString('en-US', {
       month: 'short', day: 'numeric', timeZone: 'UTC'
@@ -25,6 +35,10 @@
     if (rawCode.match(/^L(\d+)$/)) return `Loser #${rawCode.slice(1)}`;
     if (rawCode.startsWith('3')) return rawCode;
     return rawCode;
+  }
+
+  function teamCode(team) {
+    return team.resolved ? team.code : fmtCode(team.name);
   }
 
   /** @param {any} match */
@@ -53,36 +67,62 @@
   </div>
 {/snippet}
 
+{#snippet teamRowCompact(team, isWin, isLose, goals)}
+  <div class="team-row" class:win={isWin} class:lose={isLose}>
+    <span class="flag">{team.flag || '🏟'}</span>
+    <span class="compact-code">{teamCode(team)}</span>
+    <span class="score" class:score-win={isWin}>{goals}</span>
+  </div>
+{/snippet}
+
+{#snippet matchCardContent(match, w, isCompact)}
+  <span class="match-num">#{match.num}</span>
+
+  {#if isCompact}
+    {@render teamRowCompact(match.team1, w === 1, w === 2, match.score[0])}
+    {@render teamRowCompact(match.team2, w === 2, w === 1, match.score[1])}
+  {:else}
+    {@render teamRow(match.team1, w === 1, w === 2 && !!match.score, match.score?.[0] ?? null)}
+    {#if !match.score}
+      <div class="vs">vs</div>
+    {/if}
+    {@render teamRow(match.team2, w === 2, w === 1 && !!match.score, match.score?.[1] ?? null)}
+    <div class="meta">
+      <span class="meta-date">{fmtDate(match.date)}</span>
+      <span class="meta-venue">{match.ground}</span>
+    </div>
+  {/if}
+{/snippet}
+
+{#snippet matchCard(match)}
+  {@const w = winner(match)}
+  {@const isCompact = !!match.score && !expandedMatches.has(match.num)}
+  {#if match.score}
+    <button
+      type="button"
+      class="match-card played"
+      class:compact-view={isCompact}
+      onclick={() => toggleExpanded(match.num)}
+    >
+      {@render matchCardContent(match, w, isCompact)}
+    </button>
+  {:else}
+    <div class="match-card">
+      {@render matchCardContent(match, w, isCompact)}
+    </div>
+  {/if}
+{/snippet}
+
 <div class="bracket-outer">
   <div class="bracket">
     {#each mainRounds as round, ri}
       {@const isLast = ri === mainRounds.length - 1}
-      {@const showFull = true}
-      <div class="round" class:has-connector={!isLast} class:compact={!showFull}>
+      <div class="round" class:has-connector={!isLast}>
         <div class="round-label">{ROUND_LABELS[round.name] ?? round.name}</div>
         <ul class="round-matches">
           {#each round.matches as match (match.num)}
-            {@const w = winner(match)}
             <li class="match-slot">
-              <div class="match-card" class:played={!!match.score}>
-                <span class="match-num">#{match.num}</span>
-
-                {@render teamRow(match.team1, w === 1, w === 2 && !!match.score, match.score?.[0] ?? null)}
-
-                {#if !match.score}
-                  <div class="vs">vs</div>
-                {/if}
-
-                {@render teamRow(match.team2, w === 2, w === 1 && !!match.score, match.score?.[1] ?? null)}
-
-                <div class="meta">
-                  <span class="meta-date">{fmtDate(match.date)}</span>
-                  {#if showFull}
-                    <span class="meta-venue">{match.ground}</span>
-                  {/if}
-                </div>
-
-              </div>
+              {@render matchCard(match)}
             </li>
           {/each}
         </ul>
@@ -92,25 +132,9 @@
 
   {#if thirdPlace?.matches.length}
     {@const match = thirdPlace.matches[0]}
-    {@const w = winner(match)}
     <div class="third-wrap">
       <div class="third-label">3rd Place</div>
-      <div class="match-card" class:played={!!match.score}>
-
-        {@render teamRow(match.team1, w === 1, w === 2 && !!match.score, match.score?.[0] ?? null)}
-
-        {#if !match.score}
-          <div class="vs">vs</div>
-        {/if}
-
-        {@render teamRow(match.team2, w === 2, w === 1 && !!match.score, match.score?.[1] ?? null)}
-
-        <div class="meta">
-          <span class="meta-date">{fmtDate(match.date)}</span>
-          <span class="meta-venue">{match.ground}</span>
-        </div>
-
-      </div>
+      {@render matchCard(match)}
     </div>
   {/if}
 </div>
@@ -222,17 +246,23 @@
     position: relative;
     transition: border-color var(--transition);
   }
+  button.match-card {
+    appearance: none;
+    font: inherit;
+    text-align: left;
+    width: 100%;
+    cursor: default;
+  }
   .match-card:hover {
     border-color: var(--border-accent);
   }
   .match-card.played {
     border-color: rgba(255,255,255,0.08);
   }
-
-  /* Compact rounds get narrower cards */
-  .round.compact .match-card {
-    min-width: 150px;
+  .match-card.compact-view {
+    min-width: 140px;
     padding: 8px 10px;
+    cursor: pointer;
   }
 
   .match-num {
@@ -268,7 +298,7 @@
     width: 24px;
     text-align: center;
   }
-  .round.compact .flag {
+  .compact-view .flag {
     font-size: 1rem;
     width: 20px;
   }
@@ -291,8 +321,16 @@
   .name.guess {
     color: #8a8a8a;
   }
-  .round.compact .name {
-    font-size: 0.75rem;
+
+  .compact-code {
+    flex: 1;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.04em;
   }
 
   .score {
