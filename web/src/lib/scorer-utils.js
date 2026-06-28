@@ -1,7 +1,7 @@
 /**
  * @param {any[]} matches
  * @param {any[]} teamsInfo
- * @returns {{ name: string, team: string, teamFlag: string, teamCode: string, goals: number }[]}
+ * @returns {{ name: string, team: string, teamFlag: string, teamCode: string, goals: number, goalGroup: number }[]}
  */
 export function computeTopScorers(matches, teamsInfo) {
 	const teamByName = {};
@@ -36,8 +36,14 @@ export function computeTopScorers(matches, teamsInfo) {
 		processGoals(match.goals2, match.team2);
 	}
 
-	return Object.values(scorers).sort((a, b) => {
+	const sorted = Object.values(scorers).sort((a, b) => {
 		if (b.goals !== a.goals) return b.goals - a.goals;
 		return a.name.localeCompare(b.name);
 	});
+
+	const distinctGoals = [...new Set(sorted.map((s) => s.goals))];
+	const goalGroupMap = new Map(distinctGoals.map((g, i) => [g, i]));
+	for (const s of sorted) s.goalGroup = goalGroupMap.get(s.goals);
+
+	return sorted;
 }

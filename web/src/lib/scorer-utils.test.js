@@ -53,6 +53,12 @@ test('computeTopScorers counts goals across matches correctly', () => {
 	assert.strictEqual(scorers[3].name, 'Oh Hyeon-Gyu');
 	assert.strictEqual(scorers[3].goals, 1);
 	assert.strictEqual(scorers[3].teamCode, 'KOR');
+
+	// assert goals are grouped correctly
+	assert.strictEqual(scorers[0].goalGroup, 0); // Kane: 2 goals
+	assert.strictEqual(scorers[1].goalGroup, 0); // Bellingham: 2 goals
+	assert.strictEqual(scorers[2].goalGroup, 1); // Hwang: 1 goal
+	assert.strictEqual(scorers[3].goalGroup, 1); // Oh: 1 goal
 });
 
 test('computeTopScorers resolves team via name_normalised', () => {
