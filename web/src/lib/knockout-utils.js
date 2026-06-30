@@ -45,14 +45,35 @@ export function resolveTeam(raw, flagByName, matchWinners, matchLosers) {
  */
 export function reorderByBracket(knockoutRounds) {
 	const matchByNum = new Map();
+	// winnerToMatchNum handles the case where openfootball resolves a W-code
+	// to a team name in place (e.g. "W73" → "Canada" after the match is played).
+	const winnerToMatchNum = new Map();
 	for (const round of knockoutRounds) {
-		for (const m of round.matches) matchByNum.set(m.num, m);
+		for (const m of round.matches) {
+			matchByNum.set(m.num, m);
+			if (m.score) {
+				const [g1, g2] = m.score;
+				let winnerName = null;
+				if (g1 > g2) winnerName = m.team1.name;
+				else if (g2 > g1) winnerName = m.team2.name;
+				else if (m.penalties) {
+					const [p1, p2] = m.penalties;
+					if (p1 > p2) winnerName = m.team1.name;
+					else if (p2 > p1) winnerName = m.team2.name;
+				}
+				if (winnerName) winnerToMatchNum.set(winnerName, m.num);
+			}
+		}
 	}
 
 	function srcNums(match) {
-		const s1 = match.team1.code?.match(/^W(\d+)$/);
-		const s2 = match.team2.code?.match(/^W(\d+)$/);
-		return [s1 ? +s1[1] : null, s2 ? +s2[1] : null];
+		const resolve = (team) => {
+			const w = team.code?.match(/^W(\d+)$/);
+			if (w) return +w[1];
+			if (team.confirmed && team.name) return winnerToMatchNum.get(team.name) ?? null;
+			return null;
+		};
+		return [resolve(match.team1), resolve(match.team2)];
 	}
 
 	function order(matchNum, targetDepth, depth = 0) {
