@@ -10,9 +10,22 @@
   };
 
   const thirdPlace = $derived(knockoutRounds.find(r => r.name === 'Match for third place'));
+  const finalRound = $derived(knockoutRounds.find(r => r.name === 'Final'));
   const mainRounds = $derived(
-    knockoutRounds.filter(r => r.name !== 'Match for third place' && r.matches.length > 0)
+    knockoutRounds.filter(r => r.name !== 'Match for third place' && r.name !== 'Final' && r.matches.length > 0)
   );
+
+  // Split each round's reordered matches: first half → left bracket, second half → right bracket
+  const splitRounds = $derived(
+    mainRounds.map(round => {
+      const half = Math.ceil(round.matches.length / 2);
+      return { name: round.name, left: round.matches.slice(0, half), right: round.matches.slice(half) };
+    })
+  );
+  // Left: R32 → R16 → QF → SF (inner-to-outer reads right)
+  const leftRounds = $derived(splitRounds.map(r => ({ name: r.name, matches: r.left })));
+  // Right: SF → QF → R16 → R32 (inner-to-outer reads left, so SF is closest to Final)
+  const rightRounds = $derived([...splitRounds].reverse().map(r => ({ name: r.name, matches: r.right })));
 
   /** @type {Set<number>} */
   let expandedMatches = $state(new Set());
@@ -123,20 +136,48 @@
 {/snippet}
 
 <div class="bracket-outer">
-  <div class="bracket">
-    {#each mainRounds as round, ri}
-      {@const isLast = ri === mainRounds.length - 1}
-      <div class="round" class:has-connector={!isLast}>
-        <div class="round-label">{ROUND_LABELS[round.name] ?? round.name}</div>
-        <ul class="round-matches">
-          {#each round.matches as match (match.num)}
-            <li class="match-slot">
-              {@render matchCard(match)}
-            </li>
-          {/each}
-        </ul>
-      </div>
-    {/each}
+  <div class="bracket-split">
+
+    <!-- Left half: R32 → R16 → QF → SF -->
+    <div class="bracket-half bracket-left">
+      {#each leftRounds as round, ri}
+        <div class="round" class:has-connector={ri < leftRounds.length - 1}>
+          <div class="round-label">{ROUND_LABELS[round.name] ?? round.name}</div>
+          <ul class="round-matches">
+            {#each round.matches as match (match.num)}
+              <li class="match-slot">
+                {@render matchCard(match)}
+              </li>
+            {/each}
+          </ul>
+        </div>
+      {/each}
+    </div>
+
+    <!-- Center: Final -->
+    <div class="final-col">
+      <div class="round-label">Final</div>
+      {#if finalRound?.matches[0]}
+        {@render matchCard(finalRound.matches[0])}
+      {/if}
+    </div>
+
+    <!-- Right half: SF → QF → R16 → R32 (SF closest to center) -->
+    <div class="bracket-half bracket-right">
+      {#each rightRounds as round, ri}
+        <div class="round" class:has-connector={ri > 0}>
+          <div class="round-label">{ROUND_LABELS[round.name] ?? round.name}</div>
+          <ul class="round-matches">
+            {#each round.matches as match (match.num)}
+              <li class="match-slot">
+                {@render matchCard(match)}
+              </li>
+            {/each}
+          </ul>
+        </div>
+      {/each}
+    </div>
+
   </div>
 
   {#if thirdPlace?.matches.length}
@@ -149,20 +190,40 @@
 </div>
 
 <style>
-  /* ── Outer wrapper: horizontal scroll ── */
+  /* ── Outer wrapper ── */
   .bracket-outer {
     display: flex;
     flex-direction: column;
     gap: 40px;
   }
 
-  /* ── Bracket row ── */
-  .bracket {
+  /* ── Split bracket row ── */
+  .bracket-split {
+    display: flex;
+    align-items: stretch;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  /* ── Each half is a flex row of rounds ── */
+  .bracket-half {
     display: flex;
     align-items: stretch;
     gap: var(--conn-gap, 32px);
-    overflow-x: auto;
-    padding-bottom: 8px;
+    flex-shrink: 0;
+  }
+
+  /* ── Final column centered between the two halves ── */
+  .final-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 calc(var(--conn-gap, 32px) * 1.5);
+    flex-shrink: 0;
+  }
+  .final-col .round-label {
+    text-align: center;
   }
 
   /* ── Round column ── */
@@ -201,17 +262,11 @@
   }
 
   /*
-    Connector lines on source rounds (has-connector):
-
+    LEFT bracket connectors (stubs go RIGHT):
     ::before — horizontal stub going right across the gap
-    ::after  — vertical bracket arm:
-               odd slots go DOWN from center (connect to slot below)
-               even slots go UP from center  (connect to slot above)
-
-    Together, each pair of slots forms a ⌐ and L that meet
-    at the boundary between them = center of the next round's slot.
+    ::after  — vertical bracket arm connecting pairs to next round's slot
   */
-  .round.has-connector .match-slot::before {
+  .bracket-left .round.has-connector .match-slot::before {
     content: '';
     position: absolute;
     top: 50%;
@@ -222,7 +277,7 @@
     transform: translateY(-1px);
   }
 
-  .round.has-connector .match-slot:nth-child(odd)::after {
+  .bracket-left .round.has-connector .match-slot:nth-child(odd)::after {
     content: '';
     position: absolute;
     top: 50%;
@@ -232,11 +287,47 @@
     background: var(--border-accent, rgba(255,255,255,0.15));
   }
 
-  .round.has-connector .match-slot:nth-child(even)::after {
+  .bracket-left .round.has-connector .match-slot:nth-child(even)::after {
     content: '';
     position: absolute;
     bottom: 50%;
     left: calc(100% + var(--conn-gap, 32px));
+    width: 2px;
+    height: 50%;
+    background: var(--border-accent, rgba(255,255,255,0.15));
+  }
+
+  /*
+    RIGHT bracket connectors (stubs go LEFT — mirrored):
+    ::before — horizontal stub going left across the gap
+    ::after  — vertical bracket arm on the left side
+  */
+  .bracket-right .round.has-connector .match-slot::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    width: var(--conn-gap, 32px);
+    height: 2px;
+    background: var(--border-accent, rgba(255,255,255,0.15));
+    transform: translateY(-1px);
+  }
+
+  .bracket-right .round.has-connector .match-slot:nth-child(odd)::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: calc(100% + var(--conn-gap, 32px));
+    width: 2px;
+    height: 50%;
+    background: var(--border-accent, rgba(255,255,255,0.15));
+  }
+
+  .bracket-right .round.has-connector .match-slot:nth-child(even)::after {
+    content: '';
+    position: absolute;
+    bottom: 50%;
+    right: calc(100% + var(--conn-gap, 32px));
     width: 2px;
     height: 50%;
     background: var(--border-accent, rgba(255,255,255,0.15));
