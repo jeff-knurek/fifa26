@@ -38,7 +38,7 @@
   }
 
   function teamCode(team) {
-    return team.resolved ? team.code : fmtCode(team.name);
+    return team.resolved ? team.name : fmtCode(team.name);
   }
 
   /** @param {any} match */
@@ -47,6 +47,11 @@
     const [g1, g2] = match.score;
     if (g1 > g2) return 1;
     if (g2 > g1) return 2;
+    if (match.penalties) {
+      const [p1, p2] = match.penalties;
+      if (p1 > p2) return 1;
+      if (p2 > p1) return 2;
+    }
     return 0;
   }
 </script>
@@ -87,6 +92,10 @@
       <div class="vs">vs</div>
     {/if}
     {@render teamRow(match.team2, w === 2, w === 1 && !!match.score, match.score?.[1] ?? null)}
+    {#if match.penalties}
+      {@const penWinner = w === 1 ? match.team1.name : match.team2.name}
+      <div class="pen-row">Penalties: {match.penalties[0]}:{match.penalties[1]} · {penWinner}</div>
+    {/if}
     <div class="meta">
       <span class="meta-date">{fmtDate(match.date)}</span>
       <span class="meta-venue">{match.ground}</span>
@@ -304,7 +313,7 @@
   }
 
   .name {
-    flex: 1;
+    flex: 0.8;
     font-size: 0.82rem;
     font-weight: 600;
     color: var(--text-primary);
@@ -323,7 +332,7 @@
   }
 
   .compact-code {
-    flex: 1;
+    flex: 0.8;
     font-size: 0.8rem;
     font-weight: 700;
     color: var(--text-primary);
@@ -343,6 +352,16 @@
   }
   .score.score-win {
     color: var(--gold);
+  }
+
+  /* ── Penalties row ── */
+  .pen-row {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.04em;
+    padding: 2px 4px;
+    text-align: center;
   }
 
   /* ── vs separator ── */

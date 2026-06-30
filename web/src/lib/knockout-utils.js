@@ -102,11 +102,17 @@ export function computeKnockoutData({ matches, groupsData, flagByName }) {
 				const t1 = resolveTeam(m.team1, flagByName, matchWinners, matchLosers);
 				const t2 = resolveTeam(m.team2, flagByName, matchWinners, matchLosers);
 				const score = m.score?.ft ?? null;
+				const penalties = m.score?.p ?? null;
 
 				if (score && t1 && t2) {
 					const [g1, g2] = score;
 					if (g1 > g2) { matchWinners[m.num] = t1; matchLosers[m.num] = t2; }
 					else if (g2 > g1) { matchWinners[m.num] = t2; matchLosers[m.num] = t1; }
+					else if (penalties) {
+						const [p1, p2] = penalties;
+						if (p1 > p2) { matchWinners[m.num] = t1; matchLosers[m.num] = t2; }
+						else if (p2 > p1) { matchWinners[m.num] = t2; matchLosers[m.num] = t1; }
+					}
 				}
 
 				return {
@@ -115,7 +121,8 @@ export function computeKnockoutData({ matches, groupsData, flagByName }) {
 					ground: m.ground,
 					team1: { name: t1?.name ?? m.team1, flag: t1?.flag ?? '', resolved: !!t1, confirmed: !isCode(m.team1), code: isCode(m.team1) ? m.team1 : null },
 					team2: { name: t2?.name ?? m.team2, flag: t2?.flag ?? '', resolved: !!t2, confirmed: !isCode(m.team2), code: isCode(m.team2) ? m.team2 : null },
-					score
+					score,
+					penalties
 				};
 			})
 	}));
