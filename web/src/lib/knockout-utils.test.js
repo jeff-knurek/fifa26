@@ -135,6 +135,87 @@ test('reorderByBracket: handles a 4-team bracket (QF → SF → Final) correctly
 
 // ── computeKnockoutData (integration) ────────────────────────────────────────
 
+// ── computeKnockoutData — penalty shootouts ───────────────────────────────────
+
+test('computeKnockoutData: penalty winner set when ft is tied', () => {
+	const matches = [
+		{ num: 10, round: 'Quarter-final', date: '2026-07-01', ground: 'X',
+		  team1: 'Germany', team2: 'Paraguay',
+		  score: { ft: [1, 1], et: [1, 1], p: [3, 4] } }
+	];
+
+	const { knockoutRounds } = computeKnockoutData({ matches, groupsData: [], flagByName: { Germany: '🇩🇪', Paraguay: '🇵🇾' } });
+
+	const qf = knockoutRounds.find(r => r.name === 'Quarter-final');
+	const m = qf.matches[0];
+	assert.deepStrictEqual(m.score, [1, 1]);
+	assert.deepStrictEqual(m.penalties, [3, 4]);
+});
+
+test('computeKnockoutData: team2 wins on penalties, propagates via W-code', () => {
+	const matches = [
+		{ num: 10, round: 'Semi-final', date: '2026-07-01', ground: 'X',
+		  team1: 'Germany', team2: 'Paraguay',
+		  score: { ft: [1, 1], et: [1, 1], p: [3, 4] } },
+		{ num: 20, round: 'Final', date: '2026-07-10', ground: 'Z',
+		  team1: 'W10', team2: 'Brazil' }
+	];
+
+	const flagByName = { Germany: '🇩🇪', Paraguay: '🇵🇾', Brazil: '🇧🇷' };
+	const { knockoutRounds } = computeKnockoutData({ matches, groupsData: [], flagByName });
+
+	const finalRound = knockoutRounds.find(r => r.name === 'Final');
+	// W10 should resolve to Paraguay (penalty winner)
+	assert.strictEqual(finalRound.matches[0].team1.name, 'Paraguay');
+	assert.strictEqual(finalRound.matches[0].team1.flag, '🇵🇾');
+});
+
+test('computeKnockoutData: team1 wins on penalties, propagates via W-code', () => {
+	const matches = [
+		{ num: 10, round: 'Semi-final', date: '2026-07-01', ground: 'X',
+		  team1: 'Germany', team2: 'Paraguay',
+		  score: { ft: [1, 1], et: [1, 1], p: [4, 3] } },
+		{ num: 20, round: 'Final', date: '2026-07-10', ground: 'Z',
+		  team1: 'W10', team2: 'Brazil' }
+	];
+
+	const flagByName = { Germany: '🇩🇪', Paraguay: '🇵🇾', Brazil: '🇧🇷' };
+	const { knockoutRounds } = computeKnockoutData({ matches, groupsData: [], flagByName });
+
+	const finalRound = knockoutRounds.find(r => r.name === 'Final');
+	assert.strictEqual(finalRound.matches[0].team1.name, 'Germany');
+});
+
+test('computeKnockoutData: L-code resolves to penalty loser', () => {
+	const matches = [
+		{ num: 10, round: 'Semi-final', date: '2026-07-01', ground: 'X',
+		  team1: 'Germany', team2: 'Paraguay',
+		  score: { ft: [1, 1], et: [1, 1], p: [3, 4] } },
+		{ num: 30, round: 'Match for third place', date: '2026-07-12', ground: 'Z',
+		  team1: 'L10', team2: 'Brazil' }
+	];
+
+	const flagByName = { Germany: '🇩🇪', Paraguay: '🇵🇾', Brazil: '🇧🇷' };
+	const { knockoutRounds } = computeKnockoutData({ matches, groupsData: [], flagByName });
+
+	const third = knockoutRounds.find(r => r.name === 'Match for third place');
+	// L10 should resolve to Germany (penalty loser)
+	assert.strictEqual(third.matches[0].team1.name, 'Germany');
+});
+
+test('computeKnockoutData: no penalties field when score decided in ft', () => {
+	const matches = [
+		{ num: 10, round: 'Quarter-final', date: '2026-07-01', ground: 'X',
+		  team1: 'Germany', team2: 'Brazil',
+		  score: { ft: [2, 1] } }
+	];
+
+	const { knockoutRounds } = computeKnockoutData({ matches, groupsData: [], flagByName: {} });
+
+	const m = knockoutRounds.find(r => r.name === 'Quarter-final').matches[0];
+	assert.strictEqual(m.penalties, null);
+});
+
 test('computeKnockoutData: smoke test — assembles rounds and propagates winners', () => {
 	const groupsData = [{ name: 'Group A', teams: ['A1', 'A2', 'A3', 'A4'].map((n, i) => makeTeam(n, 3 - i)) }];
 	const flagByName = { A1: '🇦', A2: '🇧' };
