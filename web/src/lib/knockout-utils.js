@@ -122,7 +122,7 @@ export function computeKnockoutData({ matches, groupsData, flagByName }) {
 			.map((m) => {
 				const t1 = resolveTeam(m.team1, flagByName, matchWinners, matchLosers);
 				const t2 = resolveTeam(m.team2, flagByName, matchWinners, matchLosers);
-				const score = m.score?.ft ?? null;
+				const score = m.score?.et ?? m.score?.ft ?? null;
 				const penalties = m.score?.p ?? null;
 
 				if (score && t1 && t2) {
