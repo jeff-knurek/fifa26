@@ -90,7 +90,7 @@ export function transformMatches(matches, teams) {
 
         const validLines = descriptionLines.filter(Boolean);
 
-        if (diffInDays >= 3 && match.score && match.score.ft) {
+        if (diffInDays >= 1 && match.score && match.score.ft) {
             validLines.push(...buildScoreLines(match));
         } else if (diffInDays >= 0) {
             validLines.push(`Score: PENDING`);
