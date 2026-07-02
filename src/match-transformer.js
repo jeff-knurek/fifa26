@@ -1,3 +1,31 @@
+export function buildScoreLines(match) {
+    const lines = [];
+    const ft = match.score.ft;
+    lines.push(`Score: ${ft[0]}-${ft[1]}`);
+
+    if (match.score.et) {
+        lines.push(`Extra time: ${match.score.et[0]}-${match.score.et[1]}`);
+    }
+    if (match.score.p) {
+        lines.push(`Penalties: ${match.score.p[0]}-${match.score.p[1]}`);
+    }
+
+    const formatGoal = (goal) => {
+        const offset = goal.offset ? `+${goal.offset}` : '';
+        const penalty = goal.penalty ? ' (P)' : '';
+        return `${goal.name} (${goal.minute}${offset}min)${penalty}`;
+    };
+
+    if (match.goals1 && match.goals1.length > 0) {
+        lines.push(...match.goals1.map(formatGoal));
+    }
+    if (match.goals2 && match.goals2.length > 0) {
+        lines.push(...match.goals2.map(formatGoal));
+    }
+
+    return lines;
+}
+
 function getTeamDetails(teamName, teams) {
     if (!teamName) return { title: 'TBD', name: 'TBD' };
 
@@ -63,21 +91,7 @@ export function transformMatches(matches, teams) {
         const validLines = descriptionLines.filter(Boolean);
 
         if (diffInDays >= 3 && match.score && match.score.ft) {
-            validLines.push(`Score: ${match.score.ft[0]}-${match.score.ft[1]}`);
-
-            const formatGoal = (goal) => {
-                const offset = goal.offset ? `+${goal.offset}` : '';
-                const penalty = goal.penalty ? ' (P)' : '';
-                return `${goal.name} (${goal.minute}${offset}min)${penalty}`;
-            };
-
-            // add goals to description for each team
-            if (match.goals1 && match.goals1.length > 0) {
-                validLines.push(...match.goals1.map(formatGoal));
-            }
-            if (match.goals2 && match.goals2.length > 0) {
-                validLines.push(...match.goals2.map(formatGoal));
-            }
+            validLines.push(...buildScoreLines(match));
         } else if (diffInDays >= 0) {
             validLines.push(`Score: PENDING`);
         }
