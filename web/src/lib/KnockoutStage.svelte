@@ -154,11 +154,15 @@
       {/each}
     </div>
 
-    <!-- Center: Final -->
+    <!-- Center: Final + 3rd Place -->
     <div class="final-col">
       <div class="round-label">Final</div>
       {#if finalRound?.matches[0]}
         {@render matchCard(finalRound.matches[0])}
+      {/if}
+      {#if thirdPlace?.matches.length}
+        <div class="third-label">3rd Place</div>
+        {@render matchCard(thirdPlace.matches[0])}
       {/if}
     </div>
 
@@ -180,13 +184,7 @@
 
   </div>
 
-  {#if thirdPlace?.matches.length}
-    {@const match = thirdPlace.matches[0]}
-    <div class="third-wrap">
-      <div class="third-label">3rd Place</div>
-      {@render matchCard(match)}
-    </div>
-  {/if}
+
 </div>
 
 <style>
@@ -489,21 +487,13 @@
     text-overflow: ellipsis;
   }
 
-  /* ── 3rd place (detached) ── */
-  .third-wrap {
-    align-self: flex-start;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding-left: 4px;
-  }
+  /* ── 3rd place ── */
   .third-label {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 0.95rem;
     letter-spacing: 0.08em;
     color: var(--text-secondary);
-  }
-  .third-wrap .match-card {
-    min-width: 220px;
+    margin-top: 20px;
+    text-align: center;
   }
 </style>
