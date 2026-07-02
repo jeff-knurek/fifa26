@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert';
-import { transformMatches } from './match-transformer.js';
+import { transformMatches, buildScoreLines } from './match-transformer.js';
 
 test('transformMatches converts raw matches to simplified events', () => {
     const rawMatches = [
@@ -103,6 +103,54 @@ test('transformMatches converts raw matches to simplified events', () => {
     // Test that since today == 2026-06-19, there are no scores in the title or description of match 4
     assert.strictEqual(events[4].title, '🇨🇦 CAN vs 🇺🇸 USA');
     assert.strictEqual(events[4].description, 'Group C\nCanada vs USA\nMatchday 4\nScore: PENDING');
+});
+
+test('buildScoreLines returns FT score and goals for a normal match', () => {
+    const match = {
+        score: { ft: [2, 1], ht: [1, 0] },
+        goals1: [{ name: 'Kai Havertz', minute: '54' }],
+        goals2: [{ name: 'Julio Enciso', minute: '42' }]
+    };
+    assert.deepStrictEqual(buildScoreLines(match), [
+        'Score: 2-1',
+        'Kai Havertz (54min)',
+        'Julio Enciso (42min)'
+    ]);
+});
+
+test('buildScoreLines includes extra time and penalty lines when present', () => {
+    const match = {
+        score: { p: [3, 4], et: [1, 1], ft: [1, 1], ht: [0, 1] },
+        goals1: [{ name: 'Kai Havertz', minute: '54' }],
+        goals2: [{ name: 'Julio Enciso', minute: '42' }]
+    };
+    assert.deepStrictEqual(buildScoreLines(match), [
+        'Score: 1-1',
+        'Extra time: 1-1',
+        'Penalties: 3-4',
+        'Kai Havertz (54min)',
+        'Julio Enciso (42min)'
+    ]);
+});
+
+test('buildScoreLines includes extra time but no penalty when match decided in ET', () => {
+    const match = {
+        score: { et: [3, 2], ft: [2, 2], ht: [0, 1] },
+        goals1: [
+            { name: 'Romelu Lukaku', minute: '86' },
+            { name: 'Youri Tielemans', minute: '89' },
+            { name: 'Youri Tielemans', minute: '120+5', penalty: true }
+        ],
+        goals2: [
+            { name: 'Habib Diarra', minute: '25' },
+            { name: 'Ismaïla Sarr', minute: '51' }
+        ]
+    };
+    const lines = buildScoreLines(match);
+    assert.strictEqual(lines[0], 'Score: 2-2');
+    assert.strictEqual(lines[1], 'Extra time: 3-2');
+    assert.strictEqual(lines.some(l => l.includes('Penalties')), false);
+    assert.ok(lines.some(l => l.includes('Tielemans') && l.includes('(P)')));
 });
 
 test('transformMatches throws an error if teams data is missing or invalid', () => {
