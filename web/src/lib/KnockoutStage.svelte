@@ -340,7 +340,7 @@
     display: flex;
     flex-direction: column;
     gap: 3px;
-    min-width: 190px;
+    width: 165px;
     position: relative;
     transition: border-color var(--transition);
   }
@@ -348,7 +348,6 @@
     appearance: none;
     font: inherit;
     text-align: left;
-    width: 100%;
     cursor: default;
   }
   .match-card:hover {
@@ -358,7 +357,6 @@
     border-color: rgba(255,255,255,0.08);
   }
   .match-card.compact-view {
-    min-width: 140px;
     padding: 8px 10px;
     cursor: pointer;
   }
