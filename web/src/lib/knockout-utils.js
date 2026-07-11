@@ -45,14 +45,35 @@ export function resolveTeam(raw, flagByName, matchWinners, matchLosers) {
  */
 export function reorderByBracket(knockoutRounds) {
 	const matchByNum = new Map();
+	// winnerToMatchNum handles the case where openfootball resolves a W-code
+	// to a team name in place (e.g. "W73" → "Canada" after the match is played).
+	const winnerToMatchNum = new Map();
 	for (const round of knockoutRounds) {
-		for (const m of round.matches) matchByNum.set(m.num, m);
+		for (const m of round.matches) {
+			matchByNum.set(m.num, m);
+			if (m.score) {
+				const [g1, g2] = m.score;
+				let winnerName = null;
+				if (g1 > g2) winnerName = m.team1.name;
+				else if (g2 > g1) winnerName = m.team2.name;
+				else if (m.penalties) {
+					const [p1, p2] = m.penalties;
+					if (p1 > p2) winnerName = m.team1.name;
+					else if (p2 > p1) winnerName = m.team2.name;
+				}
+				if (winnerName) winnerToMatchNum.set(winnerName, m.num);
+			}
+		}
 	}
 
 	function srcNums(match) {
-		const s1 = match.team1.code?.match(/^W(\d+)$/);
-		const s2 = match.team2.code?.match(/^W(\d+)$/);
-		return [s1 ? +s1[1] : null, s2 ? +s2[1] : null];
+		const resolve = (team) => {
+			const w = team.code?.match(/^W(\d+)$/);
+			if (w) return +w[1];
+			if (team.confirmed && team.name) return winnerToMatchNum.get(team.name) ?? null;
+			return null;
+		};
+		return [resolve(match.team1), resolve(match.team2)];
 	}
 
 	function order(matchNum, targetDepth, depth = 0) {
@@ -101,12 +122,18 @@ export function computeKnockoutData({ matches, groupsData, flagByName }) {
 			.map((m) => {
 				const t1 = resolveTeam(m.team1, flagByName, matchWinners, matchLosers);
 				const t2 = resolveTeam(m.team2, flagByName, matchWinners, matchLosers);
-				const score = m.score?.ft ?? null;
+				const score = m.score?.et ?? m.score?.ft ?? null;
+				const penalties = m.score?.p ?? null;
 
 				if (score && t1 && t2) {
 					const [g1, g2] = score;
 					if (g1 > g2) { matchWinners[m.num] = t1; matchLosers[m.num] = t2; }
 					else if (g2 > g1) { matchWinners[m.num] = t2; matchLosers[m.num] = t1; }
+					else if (penalties) {
+						const [p1, p2] = penalties;
+						if (p1 > p2) { matchWinners[m.num] = t1; matchLosers[m.num] = t2; }
+						else if (p2 > p1) { matchWinners[m.num] = t2; matchLosers[m.num] = t1; }
+					}
 				}
 
 				return {
@@ -115,7 +142,8 @@ export function computeKnockoutData({ matches, groupsData, flagByName }) {
 					ground: m.ground,
 					team1: { name: t1?.name ?? m.team1, flag: t1?.flag ?? '', resolved: !!t1, confirmed: !isCode(m.team1), code: isCode(m.team1) ? m.team1 : null },
 					team2: { name: t2?.name ?? m.team2, flag: t2?.flag ?? '', resolved: !!t2, confirmed: !isCode(m.team2), code: isCode(m.team2) ? m.team2 : null },
-					score
+					score,
+					penalties
 				};
 			})
 	}));
