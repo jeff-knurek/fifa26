@@ -507,6 +507,11 @@ body {
   font-weight: 500;
   white-space: nowrap;
 }
+.player-age {
+  color: var(--text-secondary);
+  font-weight: 400;
+  font-size: 0.85em;
+}
 .col-club-country {
   white-space: nowrap;
   display: flex;
