@@ -181,7 +181,7 @@
                                 <td class="col-pos">
                                   <span class="pos-badge pos-{p.pos}">{p.pos}</span>
                                 </td>
-                                <td class="col-name">{p.name}</td>
+                                <td class="col-name">{p.name}{#if p.age != null} <span class="player-age">({p.age})</span>{/if}</td>
                                 <td>
                                   <div class="col-club-country">
                                     {#if p.club?.flag}

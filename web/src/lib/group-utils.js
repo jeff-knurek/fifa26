@@ -1,3 +1,14 @@
+/** @param {string|undefined} dob — ISO date string e.g. "2000-05-17" */
+function calcAge(dob) {
+	if (!dob) return null;
+	const today = new Date();
+	const birth = new Date(dob);
+	let age = today.getFullYear() - birth.getFullYear();
+	const monthDiff = today.getMonth() - birth.getMonth();
+	if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--;
+	return age;
+}
+
 /**
  * Accumulates W/D/L/GF/GA for each team from group-stage matches only.
  * @param {any[]} matches
@@ -74,7 +85,8 @@ export function computeGroupsData({ groups, matches, teamsInfo, squads, flagByCo
 			const squadPlayers = squadByName[teamName] || squadByName[teamInfo?.fifa_code] || [];
 			const players = squadPlayers.map((p) => ({
 				...p,
-				club: { ...p.club, flag: flagByCode[p.club?.country] || null }
+				club: { ...p.club, flag: flagByCode[p.club?.country] || null },
+				age: calcAge(p.date_of_birth)
 			}));
 			players.sort((a, b) => a.number - b.number);
 
