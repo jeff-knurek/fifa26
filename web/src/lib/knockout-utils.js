@@ -45,13 +45,16 @@ export function resolveTeam(raw, flagByName, matchWinners, matchLosers) {
  */
 export function reorderByBracket(knockoutRounds) {
 	const matchByNum = new Map();
-	// winnerToMatchNum handles the case where openfootball resolves a W-code
-	// to a team name in place (e.g. "W73" → "Canada" after the match is played).
-	const winnerToMatchNum = new Map();
+	// winnerByDepth[teamName][depth] = matchNum where that team won at that bracket depth.
+	// Keyed by depth so the traversal can look up a team's win at the correct level
+	// even after they advance further in the tournament.
+	/** @type {Map<string, Map<number, number>>} */
+	const winnerByDepth = new Map();
 	for (const round of knockoutRounds) {
+		const depth = ROUND_DEPTHS[round.name];
 		for (const m of round.matches) {
 			matchByNum.set(m.num, m);
-			if (m.score) {
+			if (m.score && depth !== undefined) {
 				const [g1, g2] = m.score;
 				let winnerName = null;
 				if (g1 > g2) winnerName = m.team1.name;
@@ -61,16 +64,19 @@ export function reorderByBracket(knockoutRounds) {
 					if (p1 > p2) winnerName = m.team1.name;
 					else if (p2 > p1) winnerName = m.team2.name;
 				}
-				if (winnerName) winnerToMatchNum.set(winnerName, m.num);
+				if (winnerName) {
+					if (!winnerByDepth.has(winnerName)) winnerByDepth.set(winnerName, new Map());
+					winnerByDepth.get(winnerName).set(depth, m.num);
+				}
 			}
 		}
 	}
 
-	function srcNums(match) {
+	function srcNums(match, depth) {
 		const resolve = (team) => {
 			const w = team.code?.match(/^W(\d+)$/);
 			if (w) return +w[1];
-			if (team.confirmed && team.name) return winnerToMatchNum.get(team.name) ?? null;
+			if (team.confirmed && team.name) return winnerByDepth.get(team.name)?.get(depth + 1) ?? null;
 			return null;
 		};
 		return [resolve(match.team1), resolve(match.team2)];
@@ -80,7 +86,7 @@ export function reorderByBracket(knockoutRounds) {
 		if (depth === targetDepth) return [matchNum];
 		const match = matchByNum.get(matchNum);
 		if (!match) return [];
-		const [s1, s2] = srcNums(match);
+		const [s1, s2] = srcNums(match, depth);
 		return [
 			...(s1 ? order(s1, targetDepth, depth + 1) : []),
 			...(s2 ? order(s2, targetDepth, depth + 1) : [])
